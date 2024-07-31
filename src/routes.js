@@ -246,4 +246,37 @@ router.get('/produto', async (req, res) => {
     }
 });
 
+//cadastrar pedidos
+router.post('/pedido', async (req, res) => {
+    const { cliente_id, itens } = req.body;
+
+    if (!cliente_id || !itens || !Array.isArray(itens) || itens.length === 0) {
+        return res.status(400).json({ error: 'Cliente e itens são obrigatórios' });
+    }
+
+    try {
+        const client = await db.query('BEGIN');
+
+        const pedidoResult = await db.query(
+            'INSERT INTO pedidos (cliente_id) VALUES ($1) RETURNING *',
+            [cliente_id]
+        );
+        const pedido = pedidoResult.rows[0];
+
+        for (const item of itens) {
+            const { produto_id, quantidade } = item;
+            await db.query(
+                'INSERT INTO itens_pedido (pedido_id, produto_id, quantidade) VALUES ($1, $2, $3)',
+                [pedido.id, produto_id, quantidade]
+            );
+        }
+
+        await db.query('COMMIT');
+        res.status(201).json(pedido);
+    } catch (err) {
+        await db.query('ROLLBACK');
+        res.status(500).json({ error: 'Erro ao cadastrar pedido' });
+    }
+});
+
 module.exports = router;
