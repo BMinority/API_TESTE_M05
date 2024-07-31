@@ -30,3 +30,10 @@ create table clientes (
     telefone varchar(15),
     endereco varchar(200)   
 )
+
+CREATE TABLE produtos (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  preco INTEGER NOT NULL,
+  categoria_id INTEGER REFERENCES categorias(id)
+);
