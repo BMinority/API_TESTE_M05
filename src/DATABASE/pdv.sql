@@ -37,3 +37,9 @@ CREATE TABLE produtos (
   preco INTEGER NOT NULL,
   categoria_id INTEGER REFERENCES categorias(id)
 );
+
+CREATE TABLE pedidos (
+  id SERIAL PRIMARY KEY,
+  cliente_id INTEGER REFERENCES clientes(id),
+  data TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
