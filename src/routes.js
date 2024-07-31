@@ -194,7 +194,7 @@ router.post('/cliente', async (req, res) => {
 
     try {
         const result = await db.query(
-            'INSERT INTO clientes (nome, email, telefone, endereco) VALUES ($1, $2, $3, $4) RETURNING *',
+            'INSERT INTO clientes (nome, email, telefone, endereco) values ($1, $2, $3, $4) returning *',
             [nome, email, telefone, endereco]
         );
         res.status(201).json(result.rows[0]);
@@ -210,7 +210,7 @@ router.post('/cliente', async (req, res) => {
 //listar clientes
 router.get('/cliente', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM clientes');
+        const result = await db.query('select * from clientes');
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar clientes' });
@@ -227,7 +227,7 @@ router.post('/produto', async (req, res) => {
 
     try {
         const result = await db.query(
-            'INSERT INTO produtos (nome, preco, categoria_id) VALUES ($1, $2, $3) RETURNING *',
+            'INSERT INTO produtos (nome, preco, categoria_id) values ($1, $2, $3) returning *',
             [nome, preco, categoria_id]
         );
         res.status(201).json(result.rows[0]);
@@ -239,7 +239,7 @@ router.post('/produto', async (req, res) => {
 //listar produtos
 router.get('/produto', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM produtos');
+        const result = await db.query('select * from produtos');
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar produtos' });
@@ -258,7 +258,7 @@ router.post('/pedido', async (req, res) => {
         const client = await db.query('BEGIN');
 
         const pedidoResult = await db.query(
-            'INSERT INTO pedidos (cliente_id) VALUES ($1) RETURNING *',
+            'insert into pedidos (cliente_id) values ($1) returning *',
             [cliente_id]
         );
         const pedido = pedidoResult.rows[0];
@@ -266,15 +266,15 @@ router.post('/pedido', async (req, res) => {
         for (const item of itens) {
             const { produto_id, quantidade } = item;
             await db.query(
-                'INSERT INTO itens_pedido (pedido_id, produto_id, quantidade) VALUES ($1, $2, $3)',
+                'insert into itens_pedido (pedido_id, produto_id, quantidade) VALUES ($1, $2, $3)',
                 [pedido.id, produto_id, quantidade]
             );
         }
 
-        await db.query('COMMIT');
+        await db.query('commit');
         res.status(201).json(pedido);
     } catch (err) {
-        await db.query('ROLLBACK');
+        await db.query('rollback');
         res.status(500).json({ error: 'Erro ao cadastrar pedido' });
     }
 });
