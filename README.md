@@ -26,3 +26,14 @@ com o corpo da requisição como JSON:
   "senha": "jose"
 }
 
+## Testar a Rota de Redefinição de Senha:
+
+No Insomnia, configure uma requisição PATCH para
+http://localhost:3000/api/usuario/redefinir
+com o corpo da requisição como JSON:
+
+{
+  "email": "jose@email.com",
+  "senha_antiga": "jose",
+  "senha_nova": "jose123"
+}
