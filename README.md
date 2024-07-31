@@ -37,3 +37,44 @@ com o corpo da requisição como JSON:
   "senha_antiga": "jose",
   "senha_nova": "jose123"
 }
+
+## Testar as Rotas de Clientes:
+
+Cadastrar um cliente: POST para
+http://localhost:3000/api/cliente
+com o corpo:
+
+{
+  "nome": "Maria",
+  "email": "maria@email.com",
+  "telefone": "123456789",
+  "endereco": "Rua A, 123"
+}
+
+## Listar clientes: GET para
+http://localhost:3000/api/cliente.
+
+## Cadastrar um produto: POST para
+http://localhost:3000/api/produto
+com o corpo:
+
+{
+  "nome": "Notebook",
+  "preco": 300000,
+  "categoria_id": 1
+}
+
+## Listar produtos: GET para
+http://localhost:3000/api/produto.
+
+
+## Cadastrar um pedido: POST para
+http://localhost:3000/api/pedido
+com o corpo:
+
+{
+  "cliente_id": 1,
+  "itens": [
+    { "produto_id": 1, "quantidade": 2 }
+  ]
+}
