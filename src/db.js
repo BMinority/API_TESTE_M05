@@ -1,15 +1,13 @@
-const { query } = require('express');
-const Pool = require('pg');
+const { Pool } = require('pg');
 
 const pool = new Pool({
-    user: '',
-    host: '',
-    database: '',
-    password: '',
-    port: 5432
-
+    user: 'seu_usuario',
+    host: 'localhost',
+    database: 'pdv',
+    password: 'sua_senha',
+    port: 5432,
 });
 
 module.exports = {
-    query: (text, params) => pool.query(text.params),
+    query: (text, params) => pool.query(text, params),
 };
