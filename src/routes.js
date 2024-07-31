@@ -217,4 +217,23 @@ router.get('/cliente', async (req, res) => {
     }
 });
 
+//cadastrar produtos
+router.post('/produto', async (req, res) => {
+    const { nome, preco, categoria_id } = req.body;
+
+    if (!nome || !preco || !categoria_id) {
+        return res.status(400).json({ error: 'Nome, preço e categoria são obrigatórios' });
+    }
+
+    try {
+        const result = await db.query(
+            'INSERT INTO produtos (nome, preco, categoria_id) VALUES ($1, $2, $3) RETURNING *',
+            [nome, preco, categoria_id]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao cadastrar produto' });
+    }
+});
+
 module.exports = router;
