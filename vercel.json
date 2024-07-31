@@ -6,7 +6,7 @@
             "user": "@vercel/node"
         }
     ],
-    "routers": [
+    "routes": [
         {
             "src": "(.*)",
             "dest": "src/index.js"
