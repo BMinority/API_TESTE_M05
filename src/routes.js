@@ -7,6 +7,8 @@ const Joi = require('joi');
 const nodemailer = require('nodemailer');
 const winston = require('winston');
 
+const authenticateToken = require('./MIDDLEWARE/auth');
+
 const schema = Joi.object({
     email: Joi.string().email().required(),
     senha_antiga: Joi.string().required(),
@@ -293,6 +295,52 @@ router.get('/pedido', async (req, res) => {
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: 'Erro ao listar pedidos' });
+    }
+});
+
+//detalhe do usuario logado
+router.get('/usuario', authenticateToken, async (req, res) => {
+    const userId = req.user.id; // Acessar o ID do usuário do token
+
+    try {
+        const result = await db.query('SELECT id, nome, email FROM usuarios WHERE id = $1', [userId]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao buscar perfil do usuário' });
+    }
+});
+
+//editar perfil do usuario logado
+router.put('/usuario', authenticateToken, async (req, res) => {
+    const userId = req.user.id;
+    const { nome, email, senha } = req.body;
+
+    if (!nome || !email || !senha) {
+        return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
+    }
+
+    try {
+        // Verificar se o e-mail já está em uso por outro usuário
+        const emailResult = await db.query('SELECT id FROM usuarios WHERE email = $1 AND id != $2', [email, userId]);
+        if (emailResult.rows.length > 0) {
+            return res.status(400).json({ error: 'Email já cadastrado por outro usuário' });
+        }
+
+        // Criptografar a nova senha
+        const hashedPassword = await bcrypt.hash(senha, 10);
+
+        // Atualizar o perfil do usuário
+        await db.query(
+            'UPDATE usuarios SET nome = $1, email = $2, senha = $3 WHERE id = $4',
+            [nome, email, hashedPassword, userId]
+        );
+
+        res.status(204).send();
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao atualizar perfil do usuário' });
     }
 });
 
