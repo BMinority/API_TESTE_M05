@@ -3,6 +3,9 @@ const router = express.Router();
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+const nodemailer = require('nodemailer');
+
 
 //categorias
 router.get('/categoria', async (req, res) => {
