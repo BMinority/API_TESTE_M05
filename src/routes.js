@@ -207,5 +207,14 @@ router.post('/cliente', async (req, res) => {
     }
 });
 
+//listar clientes
+router.get('/cliente', async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM clientes');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao listar clientes' });
+    }
+});
 
 module.exports = router;
