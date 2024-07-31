@@ -22,3 +22,11 @@ insert into categorias (descricao) values
 ('Moda'), 
 ('Bebê'), 
 ('Games');
+
+create table clientes (
+    id serial primary key,
+    nome varchar(100) not null,
+    email varchar(100) unique not null,
+    telefone varchar(15),
+    endereco varchar(200)   
+)
