@@ -5,6 +5,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 const nodemailer = require('nodemailer');
+const winston = require('winston');
+
+const schema = Joi.object({
+    email: Joi.string().email().required(),
+    senha_antiga: Joi.string().required(),
+    senha_nova: Joi.string().required(),
+});
 
 
 //categorias
@@ -42,6 +49,7 @@ router.post('/usuario', async (req, res) => {
 });
 
 //login
+/*
 router.post('/login', async (req, res) => {
     const { email, senha } = req.body;
 
@@ -109,5 +117,70 @@ router.patch('/usuario/redefinir', async (req, res) => {
         res.status(500).json({ mensaem: 'Erro ao redefinir senha.' })
     }
 });
+*/
 
+router.patch('/usuario/redefinir', async (req, res) => {
+    try {
+        const { error } = await schema.validateAsync(req.body);
+        if (error) {
+            return res.status(400).json({ error: 'Preencha todos os campos.' });
+        }
+
+        const { email, senha_antiga, senha_nova } = req.body;
+
+        if (senha_antiga === senha_nova) {
+            return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha antiga.' });
+        }
+
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(400).json({ mensagem: 'Email ou senha incorretos.' });
+        }
+
+        const validPassword = await bcrypt.compare(senha_antiga, user.senha);
+        if (!validPassword) {
+            return res.status(400).json({ mensagem: 'Email ou senha incorretos' });
+        }
+
+        const hashNewPassword = await bcrypt.hash(senha_nova, 10);
+        await updatePassword(email, hashNewPassword);
+
+        await sendEmail(email, 'Senha redefinida com sucesso');
+
+        res.status(200).json({ mensagem: 'Senha redefinida com sucesso' });
+    } catch (error) {
+        winston.error(error);
+        res.status(500).json({ error: 'Erro ao redefinir senha' });
+    }
+});
+
+async function getUserByEmail(email) {
+    const result = await db.query('select * from usuarios where email = $1', [email]);
+    return result.rows[0];
+}
+
+async function updatePassword(email, password) {
+    await db.query('update usuarios set senha = $1 where email = $2', [password, email]);
+}
+
+async function sendEmail(email, message) {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.example.com',
+        port: 587,
+        secure: false, // or 'STARTTLS'
+        auth: {
+            user: 'username',
+            pass: 'password',
+        },
+    });
+
+    const mailOptions = {
+        from: 'your_email@example.com',
+        to: email,
+        subject: 'Senha redefinida com sucesso',
+        text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+}
 module.exports = router;
