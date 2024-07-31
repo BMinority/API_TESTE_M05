@@ -1,6 +1,11 @@
 const jwt = require('jsonwebtoken');
-//obs.: criar a variavel avaixo no .env
-const { JWT_SECRET } = process.env;
+require('dotenv').config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+    throw new Error('A variável de ambiente JWT_SECRET não está definida');
+}
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
