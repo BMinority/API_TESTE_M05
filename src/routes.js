@@ -70,4 +70,41 @@ router.post('/login', async (req, res) => {
     }
 });
 
+//redefinir senha
+router.patch('/usuario/redefinir', async (req, res) => {
+    const { email, senha_antiga, senha_nova } = req.body;
+
+    if (!email || !senha_antiga || !senha_nova) {
+        return res.status(400).json({ error: 'Preencha todos os campos.' });
+    }
+
+    if (senha_antiga === senha_nova) {
+        return res.status(400).json({ mensagem: 'A nova senha deve ser diferente da senha antiga.' });
+    }
+
+    try {
+        const result = await db.query('select * from usuarios where email = $1', [email]);
+        if (result.rows.length === 0) {
+            return res.status(400).json({ mensagem: 'Email ou senha incorretos.' })
+        }
+
+        const user = result.rows[0];
+        const validPassword = await bcrypt.compare(senha_antiga, user.senha);
+
+        if (!validPassword) {
+            return res.status(400).json({ mensage: 'Email ou senha incorretos' });
+        }
+
+        const hashNewPassword = await bcrypt.hash(senha_nova, 10);
+        await db.query('update usuarios set senha = $1 where email = $2', [hashNewPassword, email]);
+
+        //simulacao de envio de emails
+        console.log(`E-mail enviado para ${email}: Sua senha foi alterada com sucesso`);
+
+        res.status(200).json({ mensagem: 'Senha redefinida com sucesso' });
+    } catch (error) {
+        res.status(500).json({ mensaem: 'Erro ao redefinir senha.' })
+    }
+});
+
 module.exports = router;
