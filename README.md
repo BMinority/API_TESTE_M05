@@ -14,3 +14,15 @@ com o corpo da requisição como JSON:
   "email": "jose@email.com",
   "senha": "jose"
 }
+
+## Testar a Rota de Login:
+
+No Insomnia, configure uma requisição POST para
+http://localhost:3000/api/login
+com o corpo da requisição como JSON:
+
+{
+  "email": "jose@email.com",
+  "senha": "jose"
+}
+
