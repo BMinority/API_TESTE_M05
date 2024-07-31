@@ -236,4 +236,14 @@ router.post('/produto', async (req, res) => {
     }
 });
 
+//listar produtos
+router.get('/produto', async (req, res) => {
+    try {
+        const result = await db.query('SELECT * FROM produtos');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao listar produtos' });
+    }
+});
+
 module.exports = router;
