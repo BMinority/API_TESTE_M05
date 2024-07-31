@@ -183,4 +183,29 @@ async function sendEmail(email, message) {
 
     await transporter.sendMail(mailOptions);
 }
+
+//cadastrar clientes
+router.post('/cliente', async (req, res) => {
+    const { nome, email, telefone, endereco } = req.body;
+
+    if (!nome || !email) {
+        return res.status(400).json({ error: 'Nome e email são obrigatórios' });
+    }
+
+    try {
+        const result = await db.query(
+            'INSERT INTO clientes (nome, email, telefone, endereco) VALUES ($1, $2, $3, $4) RETURNING *',
+            [nome, email, telefone, endereco]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        if (err.code === '23505') {
+            res.status(400).json({ error: 'Email já cadastrado' });
+        } else {
+            res.status(500).json({ error: 'Erro ao cadastrar cliente' });
+        }
+    }
+});
+
+
 module.exports = router;
