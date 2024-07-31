@@ -279,4 +279,21 @@ router.post('/pedido', async (req, res) => {
     }
 });
 
+//listar pedidos
+router.get('/pedido', async (req, res) => {
+    try {
+        const result = await db.query(`
+        select p.id, p.data, c.nome AS cliente, json_agg(json_build_object('produto', pr.nome, 'quantidade', i.quantidade)) as itens
+        from pedidos p
+        join clientes c on p.cliente_id = c.id
+        join itens_pedido i on i.pedido_id = p.id
+        join produtos pr on i.produto_id = pr.id
+        group by p.id, c.nome
+      `);
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Erro ao listar pedidos' });
+    }
+});
+
 module.exports = router;
