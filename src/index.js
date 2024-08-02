@@ -45,7 +45,7 @@ let users = [];
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
     return res.json('Hello World');
 });
 
