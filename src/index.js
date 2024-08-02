@@ -46,7 +46,7 @@ let users = [];
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    return res.json('Hello World');
 });
 
 // simular o cadastro de usuario
@@ -54,9 +54,9 @@ app.post('/register', (req, res) => {
     const { name, email } = req.body;
     if (name && email) {
         users.push({ name, email });
-        res.status(201).send('Usuário cadastrado com sucesso');
+        res.status(201).json('Usuário cadastrado com sucesso');
     } else {
-        res.status(400).send('Nome e email são obrigatórios');
+        res.status(400).json('Nome e email são obrigatórios');
     }
 });
 
