@@ -39,3 +39,28 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 //senha de app do gmail:
 //fxaa avww tpqd jayw
+
+//ROTAS PARA TESTE
+let users = [];
+
+app.use(express.json());
+
+app.get('/hello', (req, res) => {
+    res.send('Hello World');
+});
+
+// simular o cadastro de usuario
+app.post('/register', (req, res) => {
+    const { name, email } = req.body;
+    if (name && email) {
+        users.push({ name, email });
+        res.status(201).send('Usuário cadastrado com sucesso');
+    } else {
+        res.status(400).send('Nome e email são obrigatórios');
+    }
+});
+
+// listagem de usuarios cadastrados
+app.get('/users', (req, res) => {
+    res.json(users);
+});
