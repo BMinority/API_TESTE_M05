@@ -54,13 +54,13 @@ app.post('/register', (req, res) => {
     const { name, email } = req.body;
     if (name && email) {
         users.push({ name, email });
-        res.status(201).json('Usuário cadastrado com sucesso');
+        return res.status(201).json('Usuário cadastrado com sucesso');
     } else {
-        res.status(400).json('Nome e email são obrigatórios');
+        return res.status(400).json('Nome e email são obrigatórios');
     }
 });
 
 // listagem de usuarios cadastrados
 app.get('/users', (req, res) => {
-    res.json(users);
+    return res.json(users);
 });
