@@ -62,4 +62,7 @@ app.post("/users", (req, res) => {
         name,
         email,
     };
+
+    users.push(newUser);
+    return res.json(newUser);
 })
