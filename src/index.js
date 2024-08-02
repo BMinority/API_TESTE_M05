@@ -1,4 +1,5 @@
-const express = require('express');
+import express from "express";
+import cors from "cors";
 const app = express();
 const port = process.env.PORT || 3000;
 const nodemailer = require('nodemailer');
@@ -44,23 +45,21 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 let users = [];
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
-    return res.json('Hello World');
+    return res.json("Hello World");
 });
 
-// simular o cadastro de usuario
-app.post('/register', (req, res) => {
-    const { name, email } = req.body;
-    if (name && email) {
-        users.push({ name, email });
-        return res.status(201).json('Usuário cadastrado com sucesso');
-    } else {
-        return res.status(400).json('Nome e email são obrigatórios');
-    }
-});
-
-// listagem de usuarios cadastrados
-app.get('/users', (req, res) => {
+app.get("/users", (req, res) => {
     return res.json(users);
-});
+})
+
+app.post("/users", (req, res) => {
+    const { name, email } = req.body;
+    const newUser = {
+        id: Math.random().toString(36),
+        name,
+        email,
+    };
+})
